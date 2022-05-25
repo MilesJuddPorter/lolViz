@@ -70,17 +70,33 @@ class LoLImage():
 		return hud
 
 	def _predict_hp_mana(self, img):
+		if len(np.where(img[:,:,1].ravel() > 175)[0]) == 0:
+			return 0, 0, False
 		gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 		__, thresh = cv2.threshold(gray, 75, 255, cv2.THRESH_BINARY)
 		contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 		two_contours = sorted(contours, key=lambda x: cv2.contourArea(x))[-2:]
-		hp_contour, mana_contour = sorted(two_contours, key=lambda x: cv2.boundingRect(x)[1])
-		__, __, hp_w, __ = cv2.boundingRect(hp_contour)
-		__, __, mana_w, __ = cv2.boundingRect(mana_contour)
+		sorted_contours = sorted(two_contours, key=lambda x: cv2.boundingRect(x)[1])
+		try:
+			__, __, hp_w, __ = cv2.boundingRect(sorted_contours[0])
+		except:
+			hp_w = -27
+		
+		try:
+			__, __, mana_w, __ = cv2.boundingRect(sorted_contours[1])
+		except:
+			mana_w = -27
 
 		hp = hp_w / 27
 		mana = mana_w / 27
-		return hp, mana
+		return hp, mana, True
+
+	def _put_text(self, img, text, pos, color=(255,255,255)):
+		fontFace = cv2.FONT_HERSHEY_TRIPLEX
+		fontScale = 0.85
+		color = color
+		thickness = 2
+		cv2.putText(img, text, pos, fontFace=2, fontScale=fontScale, color=color, thickness=thickness)
 
 	def predict_team_hp_mana(self, team_side):
 		if type(team_side) != int:
@@ -98,6 +114,39 @@ class LoLImage():
 		for ii, hpbar in enumerate(self.right_hpbars):
 			axs[ii, 1].imshow(hpbar)
 		return plt
+
+	def label_hp_mana(self):
+		left_data = self.predict_team_hp_mana(0)
+		right_data = self.predict_team_hp_mana(1)
+		a = self.image_arr.copy()
+		hp = 0.5
+		mana = 1.0
+		alive=True
+		self._put_text(a, "left team", (75, 80))
+		for jj, data in enumerate(left_data):
+			hp, mana, alive = round(data[0], 2), round(data[1], 2), data[2]
+
+			id_y = 120+95*jj
+			self._put_text(a, f"id: {jj}", (200,id_y))
+			if alive == True:
+				self._put_text(a, f"hp: {hp}", (240,id_y+30), color=(0,255,0))
+				self._put_text(a, f"mana: {mana}", (260,id_y+60), color=(20,20,255))
+			else:
+				self._put_text(a, f"DEAD", (220,id_y+45), color=(255,0,0))
+
+		self._put_text(a, "right team", (1200-150, 80))
+		for jj, data in enumerate(right_data):
+			hp, mana, alive = round(data[0], 2), round(data[1], 2), data[2]
+
+			id_y = 120+95*jj
+			self._put_text(a, f"id: {jj}", (1200-200,id_y))
+			if alive == True:
+				self._put_text(a, f"hp: {hp}", (1200-260,id_y+30), color=(0,255,0))
+				self._put_text(a, f"mana: {mana}", (1200-320,id_y+60), color=(20,20,255))
+			else:
+				self._put_text(a, f"DEAD", (1200-220,id_y+45), color=(255,0,0))
+
+		return a
 				
 
 	def plot_all(self):
