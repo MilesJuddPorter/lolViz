@@ -9,24 +9,34 @@ from numpy.lib.stride_tricks import as_strided
 
 
 class LoLImage():
-	def __init__(self, image_arr):
+	def __init__(self, image_arr, clock_coords = (220, 35, 50, 20)):
 		self.image_arr = image_arr
+		self.clock = self._grab_clock(clock_coords)
 		self.y = image_arr.shape[0]
 		self.x = image_arr.shape[1]
 		self.minimap = self._separate_minimap()
 		self.hud = self._separate_hud()
 		self.left_team, self.right_team = self._separate_teams()
 		self.left_hpbars, self.right_hpbars = self._separate_hpbars()
-		self.macro, self.clock = self._separate_macro()
 
+	def _grab_clock(self, clock_coords):
+		x,y,w,h = clock_coords
+		return cv2.cvtColor(self.image_arr[y:y+h, x:x+w], cv2.COLOR_RGB2GRAY)
 
-	def _separate_macro(self):
-		macro_b = {
-			'x':(round(0.315*self.x), round(0.69*self.x)),
-			'y':(0, round(0.1*self.y))
-		}
-		macro = self.image_arr[:macro_b['y'][1], macro_b['x'][0]:macro_b['x'][1]]
-		return macro, macro[35:55, 220:250]
+	def _process_clock(self):
+		processed_nums = []
+		thresh = cv2.threshold(self.clock , 70, 255, 0)[1]
+		contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+		numbers = [cv2.boundingRect(contour) for contour in contours if cv2.contourArea(contour) > 10]
+		sorted_nums = sorted(numbers, key=lambda x: x[0])
+
+		for number in sorted_nums:
+			padded = np.zeros((12,12))
+			x,y,w,h = number
+			padded[:h , :w] = self.clock[y:y+h, x:x+w]
+			processed_nums.append(padded)
+
+		return processed_nums
 
 
 	def _separate_hpbars(self):
@@ -89,7 +99,7 @@ class LoLImage():
 
 		hp = hp_w / 27
 		mana = mana_w / 27
-		return hp, mana, True
+		return round(hp,2), round(mana,2), True
 
 	def _put_text(self, img, text, pos, color=(255,255,255)):
 		fontFace = cv2.FONT_HERSHEY_TRIPLEX
@@ -97,6 +107,14 @@ class LoLImage():
 		color = color
 		thickness = 2
 		cv2.putText(img, text, pos, fontFace=2, fontScale=fontScale, color=color, thickness=thickness)
+
+	def predict_time(self, model):
+		nums = np.expand_dims(self._process_clock(), -1)
+		predictions = [list(pred).index(pred.max()) for pred in model.predict(nums)]
+		seconds = ''.join([str(pred) for pred in predictions[-2:]])
+		minutes = ''.join([str(pred) for pred in predictions[:-2]])
+		return minutes, seconds
+
 
 	def predict_team_hp_mana(self, team_side):
 		if type(team_side) != int:
@@ -255,6 +273,16 @@ class LoLHud():
 		cs_df.sort_values('y', inplace=True)
 		return cs_df
 
+	def get_champ_imgs(self, champ_imgs):
+		gray = cv2.cvtColor(champ_imgs, cv2.COLOR_RGB2GRAY)
+		thresh = cv2.threshold(gray, 30, 255, 0)[1]
+		contours, __ = cv2.findContours(thresh, 0, 2)
+		contours = sorted(contours, key=lambda x: cv2.contourArea(x))[len(contours) - 5:] #Get top 5 biggest contours
+		bounding_rects = [cv2.boundingRect(contour) for contour in contours] #Get bounding rects
+		bounding_rects = sorted(bounding_rects, key=lambda x: x[1]) #Sort from top to bottom
+		imgs = [champ_imgs[y:y+h, x:x+w] for x,y,w,h in bounding_rects]
+		return imgs
+		
 	def build_cs_dfs(self):
 		self.left_cs_df = self._cs_df(self.left_cs)
 		self.right_cs_df = self._cs_df(self.right_cs)
