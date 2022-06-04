@@ -273,7 +273,13 @@ class LoLHud():
 		cs_df.sort_values('y', inplace=True)
 		return cs_df
 
-	def get_champ_imgs(self, champ_imgs):
+	def get_champ_imgs(self, team):
+		if type(team) is not int:
+			raise Exception("Enter 0 or 1 as team")
+		if team == 0:
+			champ_imgs = self.left_champ_imgs
+		elif team == 1:
+			champ_imgs = self.right_champ_imgs
 		gray = cv2.cvtColor(champ_imgs, cv2.COLOR_RGB2GRAY)
 		thresh = cv2.threshold(gray, 30, 255, 0)[1]
 		contours, __ = cv2.findContours(thresh, 0, 2)
