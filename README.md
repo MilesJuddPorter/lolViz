@@ -42,4 +42,12 @@ You can then see the champions it predicted: <br>
 As well as all the data it gathered for every image! <br>
 <img width="654" alt="Screen Shot 2022-06-09 at 6 47 06 PM" src="https://user-images.githubusercontent.com/13202373/172957749-eb3e627b-11fe-497a-9af5-1c49b1f2f664.png">
 
+# Additional Info:
+There are tons of things in here I didn't discuss
 
+For example you can view the team hp/mana in LoLImage class <br>
+https://user-images.githubusercontent.com/13202373/172958036-76a0a9e0-b7be-4faa-8f1f-5105f5f444fb.mp4
+
+<br>
+And you can also label the minimap with best guesses for champion location:
+![test_loc](https://user-images.githubusercontent.com/13202373/172958093-21683f75-9d43-4eeb-bd26-2b5b35def2fd.jpg)
