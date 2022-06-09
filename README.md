@@ -7,8 +7,8 @@ Contains 4 custom built convolutional neural networks:
 4. In game detection (Classifier to determine if image is an active game) - most importantly classifies highlights/replay during stream as not active
 
 # extractor
-This is the main user interaction package
-It contains a class: Game()
+This is the main user interaction package <br>
+It contains a class: Game() <br>
 This class helps to analyze and extract data from league images. It interacts with img_helper and model_helper to save you time!
 
 # img_helper
@@ -18,8 +18,8 @@ Contains three classes:
 3. LoLMinimap(league minimap image) --> can pass in LoLImage.minimap
 
 # video_helper
-This contains a class with 2 main functions:
-One to help you turn mp4s into jpg images
+This contains a class with 2 main functions: <br>
+One to help you turn mp4s into jpg images <br>
 Another to help you turn jpgs into an mp4
 
 # model_helper
