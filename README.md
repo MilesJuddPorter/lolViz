@@ -1,5 +1,5 @@
 # lolViz
-Open Source pacakge to extract data from professional league matches!
+Open Source pacakge to extract data from professional league matches! <br>
 Contains 3 custom built convolutional neural networks:
 1. Classifier for league champion icons
 2. Process league clock time (in game time)
