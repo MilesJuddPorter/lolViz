@@ -46,6 +46,8 @@ As well as all the data it gathered for every image! <br>
 There are tons of things in here I didn't discuss
 
 For example you can view the team hp/mana in LoLImage class <br>
+<img width="1792" alt="labeled_im" src="https://user-images.githubusercontent.com/13202373/172958874-f5e44f4a-9c36-4041-a91d-3d5aba27da5e.png">
+
 <a href="https://user-images.githubusercontent.com/13202373/172958036-76a0a9e0-b7be-4faa-8f1f-5105f5f444fb.mp4">Full labeled vid</a>
 
 <br>
