@@ -31,13 +31,15 @@ game = Game(clock_coords = (620, 50, 40, 20))
 for img in list_of_imgs:
   game.analyze_image(img)
 ```
-This will process a list of images looking like:
+This will process a list of images looking like: <br>
 ![example_frame](https://user-images.githubusercontent.com/13202373/172957577-44cd1e39-a531-46ee-9b5c-0507ac2945e9.jpg)
 
-You can then see the champions it predicted:
+<br>
+You can then see the champions it predicted: <br>
 <img width="614" alt="Screen Shot 2022-06-09 at 6 46 33 PM" src="https://user-images.githubusercontent.com/13202373/172957686-b04d4c51-088f-4bcd-996b-56fe3651da96.png">
 
-As well as all the data it gathered for every image!
+<br>
+As well as all the data it gathered for every image! <br>
 <img width="654" alt="Screen Shot 2022-06-09 at 6 47 06 PM" src="https://user-images.githubusercontent.com/13202373/172957749-eb3e627b-11fe-497a-9af5-1c49b1f2f664.png">
 
 
