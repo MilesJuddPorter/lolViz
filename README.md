@@ -6,6 +6,12 @@ Contains 4 custom built convolutional neural networks:
 3. League digit classifier
 4. In game detection (Classifier to determine if image is an active game) - most importantly classifies highlights/replay during stream as not active
 
+# How it was built
+I webscraped over 500 youtube videos of professional matches - about 1 terabyte worth <br>
+From there I started building out classes to handle different parts of the screen as well as ways to turn the mp4 into images <br>
+I have over 15 sub-folders of things from champion_icon_data_generator to minimap_autoencoder where I built out smaller tools that I could use <br>
+From there I trained and trained and trained until I had workable Neural Networks <br>
+I then went back and made these NNs usable by the package to extract data!
 
 # Example use:
 ```
@@ -44,12 +50,6 @@ Another to help you turn jpgs into an mp4
 # model_helper
 Classes to serve as a wrapper around a couple custom built models to make life easier
 
-# How it was built
-I webscraped over 500 youtube videos of professional matches - about 1 terabyte worth <br>
-From there I started building out classes to handle different parts of the screen as well as ways to turn the mp4 into images <br>
-I have over 15 sub-folders of things from champion_icon_data_generator to minimap_autoencoder where I built out smaller tools that I could use <br>
-From there I trained and trained and trained until I had workable Neural Networks <br>
-I then went back and made these NNs usable by the package to extract data!
 
 # Additional Info:
 There are tons of things in here I didn't discuss
