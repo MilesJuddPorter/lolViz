@@ -19,24 +19,10 @@ class LoLImage():
 		self.left_team, self.right_team = self._separate_teams()
 		self.left_hpbars, self.right_hpbars = self._separate_hpbars()
 
+
 	def _grab_clock(self, clock_coords):
 		x,y,w,h = clock_coords
 		return cv2.cvtColor(self.image_arr[y:y+h, x:x+w], cv2.COLOR_RGB2GRAY)
-
-	def _process_clock(self):
-		processed_nums = []
-		thresh = cv2.threshold(self.clock , 70, 255, 0)[1]
-		contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-		numbers = [cv2.boundingRect(contour) for contour in contours if cv2.contourArea(contour) > 10]
-		sorted_nums = sorted(numbers, key=lambda x: x[0])
-
-		for number in sorted_nums:
-			padded = np.zeros((12,12))
-			x,y,w,h = number
-			padded[:h , :w] = self.clock[y:y+h, x:x+w]
-			processed_nums.append(padded)
-
-		return processed_nums
 
 
 	def _separate_hpbars(self):
@@ -108,13 +94,6 @@ class LoLImage():
 		thickness = 2
 		cv2.putText(img, text, pos, fontFace=2, fontScale=fontScale, color=color, thickness=thickness)
 
-	def predict_time(self, model):
-		nums = np.expand_dims(self._process_clock(), -1)
-		predictions = [list(pred).index(pred.max()) for pred in model.predict(nums)]
-		seconds = ''.join([str(pred) for pred in predictions[-2:]])
-		minutes = ''.join([str(pred) for pred in predictions[:-2]])
-		return minutes, seconds
-
 
 	def predict_team_hp_mana(self, team_side):
 		if type(team_side) != int:
@@ -177,12 +156,12 @@ class LoLImage():
 
 
 class LoLHud():
-	def __init__(self, hud_image, predict_cs = False, model = None):
+	def __init__(self, hud_image, predict_cs = False, cs_model = None):
 		self.image_arr = hud_image
 		self.gray = cv2.cvtColor(hud_image, cv2.COLOR_BGR2GRAY)
 		self.y = hud_image.shape[0]
 		self.x = hud_image.shape[1]
-		self.model = model
+		self.cs_model = cs_model
 		self.left_team, self.right_team = self.split_teams()
 		self._chop_team_imgs()
 		if predict_cs:
@@ -231,12 +210,12 @@ class LoLHud():
 		input_ready_array = padded_array.reshape(1,28,28,1)
 
 		#Predict on prepped array
-		predictions = self.model.predict(input_ready_array, 1, verbose=0)[0]
+		predictions = self.cs_model.predict(input_ready_array, 1, verbose=0)[0]
 		predicted_num = list(predictions).index(max(predictions))
 		return predicted_num
 
 	def _cs_df(self, cs_img):
-		if self.model == None:
+		if self.cs_model == None:
 			raise Exception("Set the LoLHud model to a working MNIST model or pass one in")
 
 		#Generate contours
@@ -295,10 +274,11 @@ class LoLHud():
 
 
 class LoLMinimap():
-	def __init__(self, image_arr):
+	def __init__(self, image_arr, base_img=None):
 		self.image_arr = image_arr
 		self.median_blur_kernel = np.array([[1/4,1/4],
 											[1/4,1/4]])
+		self.base_img = base_img
 
 	def _strided_convolution(self, image, weight, stride):
 		im_h, im_w = image.shape
@@ -327,6 +307,27 @@ class LoLMinimap():
 		pos = np.array(min_loc)*2
 		return pos
 
+	def _narrow_search_space(self, thresh_val = 15):
+		if self.base_img is None:
+			return self.image_arr
+
+		(r,g,b) = (np.array(channel, dtype=np.float32) for channel in cv2.split(self.image_arr))
+		(r_base,g_base,b_base) = (np.array(channel, dtype=np.float32) for channel in cv2.split(self.base_img))
+		(new_r, new_g, new_b) = (np.abs(main - base) for main, base in zip([r,g,b], [r_base,g_base,b_base]))
+		new_image = np.dstack([new_r, new_g, new_b]).astype(np.uint8)
+
+		thresh = cv2.threshold(cv2.cvtColor(new_image, cv2.COLOR_RGB2GRAY), thresh_val, 255, 0)[1]
+		contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+		contours = [contour  for contour in contours if cv2.contourArea(contour) > 250]
+		bw_image = cv2.drawContours(np.zeros(self.image_arr.shape), contours, -1, (255,255,255), -1) / 255
+		altered_mm = self.image_arr.copy()
+		for channel in range(3):
+			for ii in range(180):
+				for jj in range(181):
+					altered_mm[ii,jj,channel] = altered_mm[ii,jj,channel] * bw_image[ii,jj,channel]
+
+		return altered_mm
+
 	def predict_champion_positions(self, champ_icons):
 		if type(champ_icons) != dict:
 			raise Exception("Pass in a dictionary {champion_name:champion_icon} with the champion icon scaled to (15,15)")
@@ -341,9 +342,5 @@ class LoLMinimap():
 			cv2.rectangle(drawn_mm, pos*scale_factor,(pos*scale_factor)+np.array([scale_factor*15,scale_factor*15]), (0,255,0), 3)
 			cv2.putText(drawn_mm, str(champ), pos*scale_factor, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(255, 0, 0),thickness=1)
 		return drawn_mm
-
-
-
-
 
 
