@@ -46,7 +46,8 @@ As well as all the data it gathered for every image! <br>
 There are tons of things in here I didn't discuss
 
 For example you can view the team hp/mana in LoLImage class <br>
-![overlay](https://user-images.githubusercontent.com/13202373/172958036-76a0a9e0-b7be-4faa-8f1f-5105f5f444fb.mp4)
+<img width="1792" alt="labeled_im" src="https://user-images.githubusercontent.com/13202373/172958412-4eedd6dd-2dcd-44e5-a4ba-5c1fbbd55037.png">
+<a, href="https://user-images.githubusercontent.com/13202373/172958036-76a0a9e0-b7be-4faa-8f1f-5105f5f444fb.mp4">Full labeled vid</a>
 
 <br>
 And you can also label the minimap with best guesses for champion location:
