@@ -4,7 +4,7 @@ Contains 4 custom built convolutional neural networks:
 1. Classifier for league champion icons
 2. Process league clock time (in game time)
 3. League digit classifier
-4. In game detection (Classifier to determine if image is an active game) - most importantly classifiers highlights/replay during stream as not active
+4. In game detection (Classifier to determine if image is an active game) - most importantly classifies highlights/replay during stream as not active
 
 # extractor
 This is the main user interaction package
