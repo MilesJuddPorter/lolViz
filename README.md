@@ -13,9 +13,9 @@ This class helps to analyze and extract data from league images. It interacts wi
 
 # img_helper
 Contains three classes:
-LoLImage(full size league image)
-LoLHud(league hud image) --> can pass in LoLImage.hud
-LoLMinimap(league minimap image) --> can pass in LoLImage.minimap
+1. LoLImage(full size league image)
+2. LoLHud(league hud image) --> can pass in LoLImage.hud
+3. LoLMinimap(league minimap image) --> can pass in LoLImage.minimap
 
 # video_helper
 This contains a class with 2 main functions:
