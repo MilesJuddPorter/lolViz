@@ -23,3 +23,11 @@ Another to help you turn jpgs into an mp4
 
 # model_helper
 Classes to serve as a wrapper around a couple custom built models to make life easier
+
+
+# Example use:
+```
+game = Game(clock_coords = (620, 50, 40, 20))
+for img in list_of_imgs:
+  game.analyze_image(img)
+```
