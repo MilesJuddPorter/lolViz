@@ -21,6 +21,10 @@ for img in list_of_imgs:
 ```
 This will process a list of images looking like: <br>
 ![example_frame](https://user-images.githubusercontent.com/13202373/172957577-44cd1e39-a531-46ee-9b5c-0507ac2945e9.jpg)
+<br>
+It will break these down using 3 classes into separate parts which each have lots of individual functionality!
+![bounding_rect](https://user-images.githubusercontent.com/13202373/173434274-71966032-9fd4-443a-b251-9b3dd2ca94e3.jpg)
+
 
 <br>
 You can then see the champions it predicted: <br>
